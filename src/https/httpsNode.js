@@ -64,6 +64,8 @@ export default function https(options, formData) {
       });
     });
 
+    req.on('error', error => { return reject(error); });
+
     if (options.method !== 'GET') {
       DEBUG_LOG('\n>>> request body:\n', data.buffer.toString());
       req.write(data.buffer);
