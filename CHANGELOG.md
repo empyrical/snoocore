@@ -2,6 +2,12 @@
 
 View the [Migration Guide](http://snoocore.readme.io/v3.0.0/docs/migration-guide) for instructions on how to deal with breaking changes.
 
+## 3.2.1
+
+Fix for request errors from @donasaur
+
+PR: https://github.com/trevorsenior/snoocore/pull/147
+
 ## 3.2.0
 
 - PR from [@empyrical](https://github.com/empyrical) adds the ability to upload files
