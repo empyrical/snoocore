@@ -1,3 +1,13 @@
+### Looking for a new maintainer
+
+If interested send me a message on Gitter or Email.
+
+It's probably best to use the raw API, or look into alternatives due
+to the lack of updates this library will receive here on out. Reddit
+seems to have an official API in the works which may be worth a go:
+
+https://github.com/reddit/snoode
+
 # Snoocore
 
 A minimal and complete JavaScript driver for the Reddit API.
@@ -30,7 +40,3 @@ There is an [example code repository](https://github.com/trevorsenior/snoocore-e
 ### Questions about reddit development?
 
 Head over to [/r/redditdev](https://www.reddit.com/r/redditdev).
-
-### Looking for a new maintainer
-
-If interested send me a message on Gitter / email / Freenode (tsenior)
