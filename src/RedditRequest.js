@@ -20,12 +20,13 @@ import ResponseError from './ResponseError';
  */
 export default class RedditRequest extends events.EventEmitter {
 
-  constructor(userConfig, request, oauth, oauthAppOnly) {
+  constructor(userConfig, request, oauth, oauthAppOnly, modhash) {
     super();
     this._request = request;
     this._userConfig = userConfig;
     this._oauth = oauth;
     this._oauthAppOnly = oauthAppOnly;
+    this._modhash = modhash;
   }
 
   /*
@@ -57,9 +58,14 @@ export default class RedditRequest extends events.EventEmitter {
     if (this._userConfig.isNode) {
       // Can't set User-Agent in browser
       headers['User-Agent'] = this._userConfig.userAgent;
-    } else if (this._userConfig.useBrowserCookies) {
-      // But the admins might appreciate this
+    }
+
+    if (this._userConfig.useBrowserCookies) {
       headers['X-User-Agent'] = this._userConfig.userAgent;
+
+      if (this._modhash.hasModhash() && !this._modhash.isModhashOld()) {
+        headers['X-Modhash'] = this._modhash.getCurrentModhash();
+      }
     }
 
     if (!this._userConfig.useBrowserCookies) {
@@ -118,7 +124,11 @@ export default class RedditRequest extends events.EventEmitter {
     // If we are application only, or are bypassing authentication
     // therefore we're using application only OAuth
     if (this._userConfig.useBrowserCookies) {
-      authPromise = when.resolve();
+      if (endpoint.method === 'post') {
+        authPromise = this._modhash.getModhash();
+      } else {
+        authPromise = when.resolve();
+      }
     }
     else if (this.isApplicationOnly() || endpoint.contextOptions.bypassAuth) {
       authPromise = this._oauthAppOnly.applicationOnlyAuth();
@@ -302,6 +312,10 @@ export default class RedditRequest extends events.EventEmitter {
       this.emit('rate_limit_reached', rateLimitData);
     }
 
+    if (this._userConfig.useBrowserCookies && data.data &&
+        data.data.modhash && data.data.modhash.length) {
+      this._modhash.setModhash(data.data.modhash);
+    }
 
     return when.resolve(data);
   }
