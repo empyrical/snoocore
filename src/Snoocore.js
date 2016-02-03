@@ -8,6 +8,7 @@ import RedditRequest from './RedditRequest';
 import Throttle from './Throttle';
 import UserConfig from './UserConfig';
 import OAuth from './OAuth';
+import Modhash from './Modhash';
 import fileHelper from './https/file';
 
 export default class Snoocore extends events.EventEmitter {
@@ -57,6 +58,18 @@ export default class Snoocore extends events.EventEmitter {
       'hasAccessToken'
     ].forEach(fn => { this[fn] = this.oauth[fn].bind(this.oauth); });
 
+    if (this._userConfig.useBrowserCookies) {
+      this.modhash = new Modhash(this._userConfig, this._request);
+
+      // Expose Modhash functions in here
+      [ 'isModhashOld',
+        'setModhash',
+        'getModhash',
+        'getCurrentModhash',
+        'refreshModhash'
+      ].forEach(fn => { this[fn] = this.modhash[fn].bind(this.modhash); });
+    }
+
     this.appOnlyAuth = this.oauthAppOnly.applicationOnlyAuth.bind(this.oauthAppOnly);
 
     // Bubble up the  events
@@ -68,7 +81,8 @@ export default class Snoocore extends events.EventEmitter {
     this._redditRequest = new RedditRequest(this._userConfig,
                                             this._request,
                                             this.oauth,
-                                            this.oauthAppOnly);
+                                            this.oauthAppOnly,
+                                            this.modhash);
 
     this._redditRequest.on('access_token_expired', (responseError) => {
       this.emit('access_token_expired', responseError);
